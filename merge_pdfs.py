@@ -3,31 +3,32 @@
 
 from argparse import ArgumentParser
 from glob import glob
-from pyPdf import PdfFileReader, PdfFileWriter
+from PyPDF2 import PdfFileMerger, PdfFileReader
 import os
 
 
-def merge(path, output_filename, merge_whole_directory=False):
+def merge(path, output_filename):
+        if len(path) > 1:
+                merge_whole_directory = False
+        else:
+                merge_whole_directory = True
 	if merge_whole_directory:
 	    pdfs = []
 	    for pdf_file in glob(path + os.sep + '*.pdf'):
 	        pdfs.append(pdf_file)
 	else:
 	    pdfs = path.split(',') 		
-	output = PdfFileWriter()
 	if len(pdfs) == 0:
 	    print("No files to merge")
 	    return
+	merger = PdfFileMerger(strict=False)
 	for pdf in pdfs:
 	    if pdf == output_filename:
 	        continue
             print("Parse '%s'" % pdf)
-            document = PdfFileReader(open(pdf, 'rb'))
-            for i in range(document.getNumPages()):
-                output.addPage(document.getPage(i))
+            merger.append(PdfFileReader(file(pdf, 'rb')))
         print("Start writing '%s'" % output_filename)
-        with open(output_filename, "wb") as f:
-            output.write(f)
+        merger.write(output_filename)
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -42,10 +43,6 @@ if __name__ == "__main__":
                         dest="path",
                         default=".",
                         help="path of source PDF files separeted by comas")
-    parser.add_argument("-a", "--all",
-                        dest="all",
-                        action='store_true',
-                        help="if to merge all files from path")
                         
     args = parser.parse_args()
-    merge(args.path, args.output_filename, args.all)
+    merge(args.path, args.output_filename)

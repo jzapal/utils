@@ -26,8 +26,6 @@ def split(path):
         for i in range(inputpdf.numPages): 
 			output = PdfFileWriter()
 			output.addPage(inputpdf.getPage(i))
-			if i + 1 <  inputpdf.numPages:
-				output.addPage(inputpdf.getPage(i + 1))
 			newname = pdf[:7] + "-" + str(i) + ".pdf"
 			outputStream = file(newname, "wb")
 			output.write(outputStream)

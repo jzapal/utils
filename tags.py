@@ -1,6 +1,8 @@
 from django import template
 import json
 
+from django.utils.safestring import mark_safe
+
 register = template.Library()
 
 
@@ -14,4 +16,4 @@ def as_json(obj, fields=''):
         result = {f.name: getattr(obj, f.name) for f in obj._meta.fields if f.name in fields}
     else:
         result = {f.name: getattr(obj, f.name) for f in obj._meta.fields}
-    return json.dumps(result)
+    return mark_safe(json.dumps(result))
